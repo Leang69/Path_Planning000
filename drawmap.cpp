@@ -2,6 +2,7 @@
 #include <QGraphicsItem>
 #include <QPoint>
 #include <iostream>
+#include <QGraphicsSceneMouseEvent>
 using namespace :: std;
 DrawBlock::DrawBlock()
 {
@@ -16,9 +17,10 @@ void DrawBlock::AddBlockToScene(QGraphicsScene *Map)
     Map->addItem(block.last());
 }
 
-void DrawBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void DrawBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    cout << "Hello" << endl;
+    if(event->button() == Qt::LeftButton)
+        cout << "Goodbye" << endl;
 }
 
 

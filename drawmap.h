@@ -10,7 +10,7 @@ class DrawBlock:public QGraphicsRectItem
 public:
     DrawBlock();
     void AddBlockToScene(QGraphicsScene *Map);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QList<QGraphicsItem *> block;
     QList<QPoint *> node;
     QPoint *point;
