@@ -9,7 +9,7 @@ DrawBlcok::DrawBlcok()
     tmpRect->setRect(100,100,500,500);
     tmpRect->setFlags(QGraphicsItem::ItemIsMovable);
     block.append(tmpRect);
-    //dfadsfsdfasdfadsf
+    //dfadsfsdfasdfadsfdsfghjkdfghjdfgvh
 }
 
 void DrawBlcok::AddBlockToScene(QGraphicsScene *Map)
