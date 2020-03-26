@@ -17,6 +17,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->View->setFixedSize(1280,720);
     ui->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->View->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
+    ui->View->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
+    ui->View->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+
     ui->View->setScene(Map);
 }
 

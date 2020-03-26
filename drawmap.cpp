@@ -1,15 +1,14 @@
 #include "drawmap.h"
 #include <QGraphicsItem>
 #include <QPoint>
-#include <iostream>
 #include <QGraphicsSceneMouseEvent>
-using namespace :: std;
+#include <QRectF>
+#include <QDebug>
 DrawBlock::DrawBlock()
 {
-    this->setRect(100,100,500,500);
+    this->setRect(0,0,50,50);
     this->setFlags(QGraphicsItem::ItemIsMovable);
     block.append(this);
-    //dfadsfsdfasdfadsfdsfghjkdfghjdfgvh
 }
 
 void DrawBlock::AddBlockToScene(QGraphicsScene *Map)
@@ -17,10 +16,10 @@ void DrawBlock::AddBlockToScene(QGraphicsScene *Map)
     Map->addItem(block.last());
 }
 
-void DrawBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void DrawBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton)
-        cout << "Goodbye" << endl;
+  this->setPos(mapToScene(event->pos()));
+  qDebug() << this->pos().x() << this->pos().y();
 }
 
 
