@@ -3,21 +3,20 @@
 #include <QPoint>
 #include <iostream>
 using namespace :: std;
-DrawBlcok::DrawBlcok()
+DrawBlock::DrawBlock()
 {
-    QGraphicsRectItem *tmpRect = new QGraphicsRectItem;
-    tmpRect->setRect(100,100,500,500);
-    tmpRect->setFlags(QGraphicsItem::ItemIsMovable);
-    block.append(tmpRect);
+    this->setRect(100,100,500,500);
+    this->setFlags(QGraphicsItem::ItemIsMovable);
+    block.append(this);
     //dfadsfsdfasdfadsfdsfghjkdfghjdfgvh
 }
 
-void DrawBlcok::AddBlockToScene(QGraphicsScene *Map)
+void DrawBlock::AddBlockToScene(QGraphicsScene *Map)
 {
     Map->addItem(block.last());
 }
 
-void DrawBlcok::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void DrawBlock::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     cout << "Hello" << endl;
 }

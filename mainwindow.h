@@ -16,7 +16,7 @@ public:
     ~MainWindow();
 
 private:
-    DrawBlcok *Block = new DrawBlcok;
+    DrawBlock *Block = new DrawBlock;
     QGraphicsScene *Map;
     Ui::MainWindow *ui;
 };

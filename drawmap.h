@@ -5,10 +5,10 @@
 #include <QList>
 #include <QPoint>
 
-class DrawBlcok:public QGraphicsRectItem
+class DrawBlock:public QGraphicsRectItem
 {
 public:
-    DrawBlcok();
+    DrawBlock();
     void AddBlockToScene(QGraphicsScene *Map);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     QList<QGraphicsItem *> block;
