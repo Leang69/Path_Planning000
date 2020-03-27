@@ -1,7 +1,8 @@
 #ifndef DRAWMAP_H
 #define DRAWMAP_H
 #include <QGraphicsScene>
-#include <QGraphicsItem>
+#include <QGraphicsRectItem>
+#include <QRect>
 #include <QList>
 #include <QPoint>
 
@@ -13,7 +14,7 @@ public:
     void AddBlockToScene(QGraphicsScene *Map);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-    static QList<QGraphicsItem *> blockList;
+    static QList<DrawBlock*> blockList;
     QList<QPoint> node;
     int top;
     int bottom;

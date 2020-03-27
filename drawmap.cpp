@@ -11,7 +11,7 @@ DrawBlock::DrawBlock()
     this->setFlags(QGraphicsItem::ItemIsMovable);
     blockList.append(this);
 }
-QList<QGraphicsItem *> DrawBlock ::  blockList;
+QList<DrawBlock*> DrawBlock ::  blockList;
 int DrawBlock::randomPos(int hi, int low)
 {
     return (qrand() % ((hi + 1) - low) + low);
@@ -19,7 +19,7 @@ int DrawBlock::randomPos(int hi, int low)
 
 void DrawBlock::AddBlockToScene(QGraphicsScene *Map)
 {
-    Map->addItem(blockList.last());
+    Map->addItem(this);
     this->setPos((int)this->randomPos(0,200)
                  ,(int)this->randomPos(0,200));
 }
@@ -28,12 +28,15 @@ void DrawBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
    this->setBrush(Qt::red);
    this->setPos(mapToScene(event->pos().x()-25,event->pos().y()-25));
+    //this->setPos(event->pos().x()-25,event->pos().y()-25);
+    Q_UNUSED(event);
 }
 
 void DrawBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     this->setBrush(Qt::blue);
-    qDebug() << this->pos().x() << this->pos().y();
+    qDebug() << blockList.at(blockList.indexOf(this))->pos();
+    Q_UNUSED(event);
 }
 
 
