@@ -11,21 +11,30 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     Map = new QGraphicsScene();
-    Block->AddBlockToScene(Map);
-    Map->setSceneRect(0,0,1280,720);
+    Map->setSceneRect(0,0,600,600);
     ui->setupUi(this);
-    ui->View->setFixedSize(1280,720);
+    ui->View->setFixedSize(600,600);
     ui->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->View->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
-    ui->View->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
-    ui->View->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-
     ui->View->setScene(Map);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_BReset_clicked()
+{
+    Block->blockList.clear();
+    qDebug() << Block->blockList.length();
+    Map->clear();
+}
+
+void MainWindow::on_Create_obstacle_clicked()
+{
+    Block = new DrawBlock;
+    Block->AddBlockToScene(Map);
+    qDebug() << Block->blockList.length();
 }
 

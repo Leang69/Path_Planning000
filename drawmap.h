@@ -9,9 +9,11 @@ class DrawBlock:public QGraphicsRectItem
 {
 public:
     DrawBlock();
+    int randomPos(int hi,int low);
     void AddBlockToScene(QGraphicsScene *Map);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-    QList<QGraphicsItem *> block;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    static QList<QGraphicsItem *> blockList;
     QList<QPoint> node;
     int top;
     int bottom;

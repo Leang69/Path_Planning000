@@ -15,6 +15,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_Create_obstacle_clicked();
+
+    void on_BReset_clicked();
+
 private:
     DrawBlock *Block = new DrawBlock;
     QGraphicsScene *Map;
