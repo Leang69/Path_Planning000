@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     Map = new QGraphicsScene();
+    Block->blockList.clear();
     Map->setSceneRect(0,0,600,600);
     ui->setupUi(this);
     ui->View->setFixedSize(600,600);
@@ -27,14 +28,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_BReset_clicked()
 {
     Block->blockList.clear();
-    qDebug() << Block->blockList.length();
     Map->clear();
 }
 
 void MainWindow::on_Create_obstacle_clicked()
 {
-    Block = new DrawBlock;
-    Block->AddBlockToScene(Map);
-    qDebug() << Block->blockList.length();
+    Block = new DrawBlock(Map);
 }
 

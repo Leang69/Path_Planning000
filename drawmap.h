@@ -2,24 +2,22 @@
 #define DRAWMAP_H
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
-#include <QRect>
 #include <QList>
-#include <QPoint>
 
 class DrawBlock:public QGraphicsRectItem
 {
 public:
-    DrawBlock();
+    DrawBlock(QGraphicsScene *Scene);
+    QList<QGraphicsLineItem*> linelist;
+    QGraphicsLineItem *line = new QGraphicsLineItem;
     int randomPos(int hi,int low);
-    void AddBlockToScene(QGraphicsScene *Map);
+    QList<QPointF*>* getVertex();
+    QList<QGraphicsLineItem*> drawline();
+    void AddItemToScene(QGraphicsScene *Map);
+    void AddItemToScene(QGraphicsScene *Map,QGraphicsItem *item);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     static QList<DrawBlock*> blockList;
-    QList<QPoint> node;
-    int top;
-    int bottom;
-    int left;
-    int right;
 };
 
 

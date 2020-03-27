@@ -21,7 +21,7 @@ private slots:
     void on_BReset_clicked();
 
 private:
-    DrawBlock *Block = new DrawBlock;
+    DrawBlock *Block;
     QGraphicsScene *Map;
     Ui::MainWindow *ui;
 };
