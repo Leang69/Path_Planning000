@@ -20,14 +20,12 @@ SOURCES += \
     drawmap.cpp \
     main.cpp \
     mainwindow.cpp \
-    trapzoidalmap.cpp \
-    vertexofrec.cpp
+    trapzoidalmap.cpp
 
 HEADERS += \
     drawmap.h \
     mainwindow.h \
-    trapzoidalmap.h \
-    vertexofrec.h
+    trapzoidalmap.h
 
 FORMS += \
     mainwindow.ui

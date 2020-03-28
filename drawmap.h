@@ -8,16 +8,16 @@ class DrawBlock:public QGraphicsRectItem
 {
 public:
     DrawBlock(QGraphicsScene *Scene);
-    QList<QGraphicsLineItem*> linelist;
-    QGraphicsLineItem *line = new QGraphicsLineItem;
-    int randomPos(int hi,int low);
     QList<QPointF*>* getVertex();
     QList<QGraphicsLineItem*> drawline();
+    int randomPos(int hi,int low);
+    void trimLine();
     void AddItemToScene(QGraphicsScene *Map);
     void AddItemToScene(QGraphicsScene *Map,QGraphicsItem *item);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     static QList<DrawBlock*> blockList;
+    QList<QGraphicsLineItem*> linelist;
 };
 
 

@@ -20,6 +20,10 @@ private slots:
 
     void on_BReset_clicked();
 
+    void on_BstartPoint_clicked();
+
+    void on_BendPoint_clicked();
+
 private:
     DrawBlock *Block;
     QGraphicsScene *Map;
