@@ -1,12 +1,12 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef MYSCENE_H
+#define MYSCENE_H
 #include <QGraphicsScene>
 
-class MyScene: public QGraphicsScene
+class MyScene:public CustomScene
 {
 public:
     MyScene();
-    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 };
 
-#endif // SCENE_H
+#endif // MYSCENE_H

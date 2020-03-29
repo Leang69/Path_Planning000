@@ -1,11 +1,6 @@
-#include "scene.h"
-#include <QDebug>
-Scene::Scene()
-{
+#include "myscene.h"
 
-}
-
-void Scene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+MyScene::MyScene()
 {
 
 }

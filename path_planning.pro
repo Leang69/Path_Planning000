@@ -18,14 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     PathPlanning.cpp \
+    customscene.cpp \
     drawmap.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
 
 HEADERS += \
     PathPlanning.h \
+    customscene.h \
     drawmap.h \
-    mainwindow.h
+    mainwindow.h \
 
 FORMS += \
     mainwindow.ui

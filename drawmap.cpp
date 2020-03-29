@@ -4,7 +4,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QLineF>
 #include <QDebug>
-DrawBlock::DrawBlock(QGraphicsScene *Scene)
+DrawBlock::DrawBlock(CustomScene *Scene)
 {
     this->setRect(0,0,50,50);
     this->setBrush(Qt::blue);
@@ -144,14 +144,14 @@ void DrawBlock::trimLine()
     }
 }
 
-void DrawBlock::AddItemToScene(QGraphicsScene *Map)
+void DrawBlock::AddItemToScene(CustomScene *Map)
 {
     Map->addItem(this);
     this->setPos((int)this->randomPos(550,0)
                  ,(int)this->randomPos(550,0));
 }
 
-void DrawBlock::AddItemToScene(QGraphicsScene *Map,QGraphicsItem *item)
+void DrawBlock::AddItemToScene(CustomScene *Map,QGraphicsItem *item)
 {
     Map->addItem(item);
 }
@@ -163,7 +163,6 @@ void DrawBlock::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
    this->setBrush(Qt::red);
    this->setPos(mapToScene(event->pos().x()-25,event->pos().y()-25));
    }
-    Q_UNUSED(event);
 }
 
 void DrawBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -173,7 +172,6 @@ void DrawBlock::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
         a->drawline();
     }
-    Q_UNUSED(event);
 }
 
 

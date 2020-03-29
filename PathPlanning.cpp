@@ -8,7 +8,7 @@ PathPlanning::PathPlanning()
 
 }
 
-PathPlanning::PathPlanning(QGraphicsScene *scene,QList<DrawBlock *> block)
+PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block)
 {
    QList<QGraphicsRectItem*> *node = new QList<QGraphicsRectItem*>;
    foreach(QPointF a,getPosPoint(block))
@@ -17,6 +17,7 @@ PathPlanning::PathPlanning(QGraphicsScene *scene,QList<DrawBlock *> block)
        scene->addItem(node->last());
 
    }
+   MyScene = scene;
 }
 
 QList<QPointF> PathPlanning::getPosPoint(QList<DrawBlock *> block)
@@ -72,6 +73,26 @@ void PathPlanning::findPath(QList<QPointF> Allnode,QPointF *start,QPointF *end)
     startIndex = qLowerBound(pointINumber.begin(),pointINumber.end(),start->toPoint().x()*10000+start->toPoint().y());
     endIndex = qUpperBound(pointINumber.begin(),pointINumber.end(),end->toPoint().x()*10000+end->toPoint().y());
 
+}
+
+void PathPlanning::setStart(const QPointF &value)
+{
+    start = value;
+}
+
+void PathPlanning::setEnd(const QPointF &value)
+{
+    end = value;
+}
+
+QPointF PathPlanning::getStart() const
+{
+    return start;
+}
+
+QPointF PathPlanning::getEnd() const
+{
+    return end;
 }
 
 

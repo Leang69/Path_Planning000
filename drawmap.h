@@ -3,17 +3,18 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QList>
+#include "customscene.h"
 
 class DrawBlock:public QGraphicsRectItem
 {
 public:
-    DrawBlock(QGraphicsScene *Scene);
+    DrawBlock(CustomScene *Scene);
     QList<QPointF*>* getVertex();
     QList<QGraphicsLineItem*> drawline();
     int randomPos(int hi,int low);
     void trimLine();
-    void AddItemToScene(QGraphicsScene *Map);
-    void AddItemToScene(QGraphicsScene *Map,QGraphicsItem *item);
+    void AddItemToScene(CustomScene *Map);
+    void AddItemToScene(CustomScene *Map,QGraphicsItem *item);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     static QList<DrawBlock*> blockList;

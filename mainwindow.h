@@ -28,10 +28,10 @@ private slots:
     void on_BGenerate_clicked();
 
 private:
+    QGraphicsRectItem *startnode,*endnode;
     DrawBlock *Block;
     PathPlanning *PathMap;
-
-    QGraphicsScene *Map;
+    CustomScene *Map;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
