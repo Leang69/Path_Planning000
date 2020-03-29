@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include "drawmap.h"
+#include "PathPlanning.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -24,8 +25,12 @@ private slots:
 
     void on_BendPoint_clicked();
 
+    void on_BGenerate_clicked();
+
 private:
     DrawBlock *Block;
+    PathPlanning *PathMap;
+
     QGraphicsScene *Map;
     Ui::MainWindow *ui;
 };

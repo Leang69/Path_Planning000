@@ -17,15 +17,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    PathPlanning.cpp \
     drawmap.cpp \
     main.cpp \
-    mainwindow.cpp \
-    trapzoidalmap.cpp
+    mainwindow.cpp
 
 HEADERS += \
+    PathPlanning.h \
     drawmap.h \
-    mainwindow.h \
-    trapzoidalmap.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui

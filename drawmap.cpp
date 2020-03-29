@@ -12,15 +12,19 @@ DrawBlock::DrawBlock(QGraphicsScene *Scene)
     linelist.append(new QGraphicsLineItem());
     linelist.append(new QGraphicsLineItem());
     linelist.append(new QGraphicsLineItem());
-    qDebug() << this;
     this->setFlags(QGraphicsItem::ItemIsMovable);
     this->AddItemToScene(Scene);
-    foreach(QGraphicsItem *a,this->drawline())
+    foreach(QGraphicsItem *a,linelist)
     {
         this->AddItemToScene(Scene,a);
+        a->setVisible(false);
     }
-    this->drawline();
     blockList.append(this);
+    foreach(DrawBlock *a , blockList)
+    {
+        a->drawline();
+    }
+
 }
 QList<DrawBlock*> DrawBlock ::  blockList;
 int DrawBlock::randomPos(int hi, int low)
@@ -143,8 +147,8 @@ void DrawBlock::trimLine()
 void DrawBlock::AddItemToScene(QGraphicsScene *Map)
 {
     Map->addItem(this);
-    this->setPos((int)this->randomPos(0,200)
-                 ,(int)this->randomPos(0,200));
+    this->setPos((int)this->randomPos(550,0)
+                 ,(int)this->randomPos(550,0));
 }
 
 void DrawBlock::AddItemToScene(QGraphicsScene *Map,QGraphicsItem *item)
