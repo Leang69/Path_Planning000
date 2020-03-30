@@ -10,9 +10,13 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     QPointF getcursorPos();
 signals:
-    void chagendStartPos(QPointF start);
-    void chagendEndtPos(QPointF start);
+    void chagendStartPos();
+    void chagendEndtPos();
+public slots:
+    void isStartPoint();
+    void isEndPoint();
 private:
+    bool isStart;
     QPointF cursorPos;
 };
 

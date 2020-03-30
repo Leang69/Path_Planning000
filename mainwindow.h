@@ -15,7 +15,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+signals:
+    void isStrat();
+    void isEnd();
+    void pathFinding();
 private slots:
     void on_Create_obstacle_clicked();
 
@@ -27,11 +30,15 @@ private slots:
 
     void on_BGenerate_clicked();
 
+    void on_BPathPlannig_clicked();
+
 private:
+    bool isStartB = false;
+    bool isEndB = false;
     QGraphicsRectItem *startnode,*endnode;
     DrawBlock *Block;
     PathPlanning *PathMap;
-    CustomScene *Map;
+    CustomScene *Map  = new CustomScene();
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

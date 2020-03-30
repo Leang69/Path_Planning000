@@ -3,6 +3,7 @@
 #include <QGraphicsLineItem>
 #include <QDebug>
 #include <QThread>
+#include <customscene.h>
 PathPlanning::PathPlanning()
 {
 
@@ -10,17 +11,16 @@ PathPlanning::PathPlanning()
 
 PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block)
 {
-   QList<QGraphicsRectItem*> *node = new QList<QGraphicsRectItem*>;
-   foreach(QPointF a,getPosPoint(block))
-   {
-       node->append(new QGraphicsRectItem(a.x()-2.5,a.y()-2.5,5,5));
-       scene->addItem(node->last());
-
-   }
    MyScene = scene;
+   MyBlock = block;
+   connect(MyScene,&CustomScene::chagendStartPos,this,&PathPlanning::setStart);
+   connect(MyScene,&CustomScene::chagendEndtPos,this,&PathPlanning::setEnd);
+   scene->addItem(startNode);
+   scene->addItem(EndNode);
+
 }
 
-QList<QPointF> PathPlanning::getPosPoint(QList<DrawBlock *> block)
+QList<QPointF> PathPlanning::getCenterPointOfLine(QList<DrawBlock *> block)
 {
     QList<QPointF> AllCenterPoint;
     getAllLine(block);
@@ -63,27 +63,88 @@ void PathPlanning::sortLine(QList<QGraphicsLineItem*> *setOfLine)
         }
 }
 
-void PathPlanning::findPath(QList<QPointF> Allnode,QPointF *start,QPointF *end)
+QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF end)
 {
-    QList<int> pointINumber; QList<int>::iterator startIndex,endIndex;
+    QList<int> pointINumber;
+    int startIndex = 0;
+    int endIndex = 1;
     foreach(QPointF a , Allnode)
     {
-        pointINumber.append(a.x()*10000+a.y());
+        if(start.x()*10000+start.y() <= a.x()*10000+a.y())
+            break;
+        else
+            startIndex++;
     }
-    startIndex = qLowerBound(pointINumber.begin(),pointINumber.end(),start->toPoint().x()*10000+start->toPoint().y());
-    endIndex = qUpperBound(pointINumber.begin(),pointINumber.end(),end->toPoint().x()*10000+end->toPoint().y());
+    foreach(QPointF a , Allnode)
+    {
+        if(end.x()*10000+end.y() <= a.x()*10000+a.y())
+            break;
+        else
+            endIndex++;
+    }
 
+    Allnode.insert(startIndex,start); Allnode.insert(endIndex,end);
+    if(startIndex > endIndex)
+    {
+        int tmp = startIndex;
+        startIndex = endIndex;
+        endIndex = tmp;
+    }
+    qDebug() << Allnode;
+    qDebug() << "---------------------------------------------------";
+    qDebug() << startIndex;
+    qDebug() << endIndex;
+    qDebug() << "---------------------------------------------------";
+    QPainterPath *MyPath = new QPainterPath;
+    MyPath->moveTo(Allnode.at(startIndex));
+    QGraphicsLineItem *LinePath = new QGraphicsLineItem;
+    QLineF *l1 = new QLineF;
+    MyScene->addItem(LinePath);
+    LinePath->setVisible(false);
+    for(int i = startIndex ; i < endIndex ; i++)
+    {
+        l1->setLine(Allnode.at(i).x()+5,Allnode.at(i).y()+5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-5);
+        LinePath->setLine(*l1);
+        qDebug() << "i" <<i;
+        if(LinePath->collidingItems().length() == 0)
+        {
+            MyPath->lineTo(Allnode.at(endIndex));
+
+        }
+        else
+        {
+
+        }
+    }
+    return *MyPath;
 }
-
-void PathPlanning::setStart(const QPointF &value)
+void PathPlanning::pathFinding()
 {
-    start = value;
+
+    MyPath = this->findPath(this->getCenterPointOfLine(MyBlock),this->start,this->end);
 }
 
-void PathPlanning::setEnd(const QPointF &value)
+QPainterPath PathPlanning::getMyPath() const
 {
-    end = value;
+    return MyPath;
 }
+void PathPlanning::setStart()
+{
+    start = MyScene->getcursorPos();
+    qDebug() << "Start";
+    startNode->setRect(start.x()-2.5,start.y()-2.5,5,5);
+    startNode->setBrush(Qt::yellow);
+}
+
+void PathPlanning::setEnd()
+{
+    end = MyScene->getcursorPos();
+    qDebug() << "End";
+    EndNode->setRect(end.x()-2.5,end.y()-2.5,5,5);
+    EndNode->setBrush(Qt::gray);
+}
+
+
 
 QPointF PathPlanning::getStart() const
 {

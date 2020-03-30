@@ -2,25 +2,34 @@
 #define TRAPZOIDALMAP_H
 #include <QList>
 #include  <drawmap.h>
+#include <QPainterPath>
 
-class PathPlanning
+class PathPlanning:public QObject
 {
+    Q_OBJECT
 public:
     PathPlanning();
     PathPlanning(CustomScene *scene,QList<DrawBlock *> block);
-    QList<QPointF> getPosPoint(QList<DrawBlock*> block);
+    QList<QPointF> getCenterPointOfLine(QList<DrawBlock*> block);
     void getAllLine(QList<DrawBlock *> block);
     void sortLine(QList<QGraphicsLineItem*> *setOfLine);
-    void findPath(QList<QPointF> Allnode,QPointF *start,QPointF *end);
+    QPainterPath findPath(QList<QPointF> Allnode,QPointF start,QPointF end);
     QList<QGraphicsLineItem*> *AllLine = new QList<QGraphicsLineItem*>;
-    void setStart(const QPointF &value);
-    void setEnd(const QPointF &value);
     QPointF getStart() const;
     QPointF getEnd() const;
+    QPainterPath getMyPath() const;
 
+public slots:
+    void setStart();
+    void setEnd();
+    void pathFinding();
 private:
     QPointF start,end;
+    QGraphicsRectItem *startNode = new QGraphicsRectItem();
+    QGraphicsRectItem *EndNode = new QGraphicsRectItem();
     CustomScene *MyScene;
+    QPainterPath MyPath;
+    QList<DrawBlock *> MyBlock;
 };
 
 
