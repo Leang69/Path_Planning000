@@ -89,6 +89,10 @@ QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF
         int tmp = startIndex;
         startIndex = endIndex;
         endIndex = tmp;
+        Allnode.move(startIndex,startIndex-1);
+        Allnode.move(endIndex,endIndex-1);
+        startIndex--;
+        endIndex++;
     }
     qDebug() << Allnode;
     qDebug() << "---------------------------------------------------";
@@ -98,24 +102,114 @@ QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF
     QPainterPath *MyPath = new QPainterPath;
     MyPath->moveTo(Allnode.at(startIndex));
     QGraphicsLineItem *LinePath = new QGraphicsLineItem;
+    QGraphicsLineItem *LineTmp= new QGraphicsLineItem;
     QLineF *l1 = new QLineF;
+    QLineF *l2 = new QLineF;
     MyScene->addItem(LinePath);
+    MyScene->addItem(LineTmp);
     LinePath->setVisible(false);
-    for(int i = startIndex ; i < endIndex ; i++)
+
+    int sourceIndex = startIndex;
+    int shortLength = 10000000;
+    int shortIndex = startIndex;
+    int x = Allnode.at(sourceIndex).x();
+
+    l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+    LinePath->setLine(*l1);
+    if(LinePath->collidingItems().length() == 0)
     {
-        l1->setLine(Allnode.at(i).x()+5,Allnode.at(i).y()+5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-5);
+        MyPath->lineTo(Allnode.at(endIndex));
+        return *MyPath;
+
+    }
+
+    for(int i = startIndex+1 ; i < endIndex ; i++)
+    {
+        /*l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+         *
         LinePath->setLine(*l1);
-        qDebug() << "i" <<i;
         if(LinePath->collidingItems().length() == 0)
         {
             MyPath->lineTo(Allnode.at(endIndex));
-
+            break;
         }
         else
         {
 
+            if(Allnode.at(i).x() == x)
+            {
+                l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(i).x()-5,Allnode.at(i).y()-2.5);
+                l2->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+                LinePath->setLine(*l1);
+                int length = l1->length() + l2->length();
+                if(shortLength > length && LinePath->collidingItems().length() == 0)
+                {
+                    shortLength = length;
+                    shortIndex = i;
+                }
+
+            }
+            else
+            {
+                MyPath->lineTo(Allnode.at(shortIndex));
+                sourceIndex = shortIndex;
+                l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(i).x()-5,Allnode.at(i).y()-2.5);
+                l2->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+                LinePath->setLine(*l1);
+                int length = l1->length() + l2->length();
+                if(shortLength > length && LinePath->collidingItems().length() == 0)
+                {
+                    shortLength = length;
+                    shortIndex = i;
+                }
+            }
+
+        }*/
+
+        l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+        LinePath->setLine(*l1);
+        if(LinePath->collidingItems().length() == 0 && Allnode.length() > 8)
+        {
+            MyPath->lineTo(Allnode.at(endIndex));
+            break;
         }
+        l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
+        if(Allnode.at(i).x() == x)
+        {
+
+            if(Allnode.at(i).x() == x)
+            {
+                l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
+                l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
+                LinePath->setLine(*l1);
+                int length = l2->length();
+                if(shortLength > length && LinePath->collidingItems().length() == 0)
+                {
+                    shortLength = length;
+                    shortIndex = i;
+                }
+            }
+        }
+        else
+        {
+            MyPath->lineTo(Allnode.at(shortIndex));
+            qDebug() << shortIndex;
+            sourceIndex = shortIndex;
+            shortLength = 10000000;
+            l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
+            l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
+            LinePath->setLine(*l1);
+            int length = l2->length();
+            if(shortLength > length && LinePath->collidingItems().length() == 0)
+            {
+                shortLength = length;
+                shortIndex = i;
+            }
+        }
+
+
     }
+    MyPath->lineTo(Allnode.at(endIndex));
     return *MyPath;
 }
 void PathPlanning::pathFinding()
@@ -132,7 +226,7 @@ void PathPlanning::setStart()
 {
     start = MyScene->getcursorPos();
     qDebug() << "Start";
-    startNode->setRect(start.x()-2.5,start.y()-2.5,5,5);
+    startNode->setRect(start.x()-7,start.y()+2.5,5,5);
     startNode->setBrush(Qt::yellow);
 }
 
@@ -140,7 +234,7 @@ void PathPlanning::setEnd()
 {
     end = MyScene->getcursorPos();
     qDebug() << "End";
-    EndNode->setRect(end.x()-2.5,end.y()-2.5,5,5);
+    EndNode->setRect(end.x()+1,end.y()+2.5,5,5);
     EndNode->setBrush(Qt::gray);
 }
 
