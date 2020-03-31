@@ -33,6 +33,7 @@ MainWindow::~MainWindow()
 void MainWindow::on_BReset_clicked()
 {
     ui->Create_obstacle->setDisabled(false);
+    ui->BGenerate->setDisabled(false);
     ui->BstartPoint->setDisabled(true);
     ui->BendPoint->setDisabled(true);
     Block->blockList.clear();
@@ -49,7 +50,6 @@ void MainWindow::on_Create_obstacle_clicked()
 
 void MainWindow::on_BstartPoint_clicked()
 {
-    Map->removeItem(PathMap->getMyPath());
     PathMap = new PathPlanning(Map,Block->blockList);
     connect(this,&MainWindow::pathFinding,PathMap,&PathPlanning::pathFinding);
     ui->BendPoint->setDisabled(false);
@@ -71,10 +71,14 @@ void MainWindow::on_BGenerate_clicked()
     {
         a->setFlag(QGraphicsItem::ItemIsMovable,false);
     }
+    ui->BGenerate->setDisabled(true);
 }
 
 void MainWindow::on_BPathPlannig_clicked()
 {
+    ui->BstartPoint->setDisabled(true);
+    ui->BendPoint->setDisabled(true);
+    ui->BPathPlannig->setDisabled(true);
     emit this->pathFinding();
     Map->addPath(PathMap->getMyPath());
 }
