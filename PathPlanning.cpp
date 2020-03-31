@@ -177,8 +177,6 @@ QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF
         if(Allnode.at(i).x() == x)
         {
 
-            if(Allnode.at(i).x() == x)
-            {
                 l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
                 l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
                 LinePath->setLine(*l1);
@@ -188,23 +186,21 @@ QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF
                     shortLength = length;
                     shortIndex = i;
                 }
-            }
         }
         else
         {
-            MyPath->lineTo(Allnode.at(shortIndex));
-            qDebug() << shortIndex;
-            sourceIndex = shortIndex;
-            shortLength = 10000000;
-            l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
-            l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
-            LinePath->setLine(*l1);
-            int length = l2->length();
-            if(shortLength > length && LinePath->collidingItems().length() == 0)
-            {
-                shortLength = length;
-                shortIndex = i;
-            }
+                MyPath->lineTo(Allnode.at(shortIndex));
+                sourceIndex = shortIndex;
+                shortLength = 10000000;
+                l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
+                l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
+                LinePath->setLine(*l1);
+                int length = l2->length();
+                if(shortLength > length && LinePath->collidingItems().length() == 0)
+                {
+                    shortLength = length;
+                    shortIndex = i;
+                }
         }
 
 
