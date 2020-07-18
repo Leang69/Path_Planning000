@@ -13,6 +13,7 @@ public:
     QList<QPointF> getCenterPointOfLine(QList<DrawBlock*> block);
     void getAllLine(QList<DrawBlock *> block);
     void sortLine(QList<QGraphicsLineItem*> *setOfLine);
+    void constructGraph (QList<QPointF> getCenterPointOfLine);
     QPainterPath findPath(QList<QPointF> Allnode,QPointF start,QPointF end);
     QList<QGraphicsLineItem*> *AllLine = new QList<QGraphicsLineItem*>;
     QPointF getStart() const;
