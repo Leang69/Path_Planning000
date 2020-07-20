@@ -13,10 +13,10 @@ MainWindow::MainWindow(QWidget *parent)
     Block->blockList.clear();
     Map->setSceneRect(0,0,600,600);
     ui->setupUi(this);
-    ui->View->setFixedSize(600,600);
-    ui->View->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->View->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->View->setScene(Map);
+    ui->view->setFixedSize(600,600);
+    ui->view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->view->setScene(Map);
     ui->BstartPoint->setDisabled(true);
     ui->BendPoint->setDisabled(true);
     ui->BPathPlannig->setDisabled(true);
@@ -50,7 +50,7 @@ void MainWindow::on_Create_obstacle_clicked()
 
 void MainWindow::on_BstartPoint_clicked()
 {
-    PathMap = new PathPlanning(Map,Block->blockList);
+    PathMap = new PathPlanning(Map,Block->blockList,ui->view);
     connect(this,&MainWindow::pathFinding,PathMap,&PathPlanning::pathFinding);
     ui->BendPoint->setDisabled(false);
     emit this->isStrat();

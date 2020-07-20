@@ -3,16 +3,20 @@
 #include <QGraphicsLineItem>
 #include <QDebug>
 #include <QThread>
+
 #include <customscene.h>
 PathPlanning::PathPlanning()
 {
 
 }
 
-PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block)
+PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block,QGraphicsView *view)
 {
    MyScene = scene;
    MyBlock = block;
+   Myview = view;
+   offsetblock(MyBlock);
+
    connect(MyScene,&CustomScene::chagendStartPos,this,&PathPlanning::setStart);
    connect(MyScene,&CustomScene::chagendEndtPos,this,&PathPlanning::setEnd);
    scene->addItem(startNode);
@@ -22,30 +26,92 @@ PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block)
 
 
 
-QList<QPointF> PathPlanning::getCenterPointOfLine(QList<DrawBlock *> block)
+void PathPlanning::offsetblock(QList<DrawBlock *> block)
 {
-    QList<QPointF> AllCenterPoint;
-    getAllLine(block);
-    foreach(QGraphicsLineItem* a, *AllLine)
+    foreach (DrawBlock* a , block)
     {
-        AllCenterPoint.append(a->line().center());
+        QPolygonF *tmp = new QPolygonF();
+        tmp->append(QPoint(a->pos().x()-25,a->pos().y()-15));
+        tmp->append(QPoint(a->pos().x()+25+50,a->pos().y()-15));
+        tmp->append(QPoint(a->pos().x()+25+50,a->pos().y()+15+50));
+        tmp->append(QPoint(a->pos().x()-25,a->pos().y()+15+50));
+        tmp = this->mergeblock(tmp);
+        boundingBlock.append(tmp);
     }
-    return AllCenterPoint;
+    foreach (QPolygonF *a , boundingBlock)
+    {
+
+        configurationSpace.append(new QGraphicsPolygonItem(*a));
+        MyScene->addItem(configurationSpace.last());
+    }
+    constructGraph();
+
 }
 
 
 
-void PathPlanning::getAllLine(QList<DrawBlock *> block)
+QPolygonF* PathPlanning::mergeblock(QPolygonF *block)
 {
-    foreach(DrawBlock *a,block)
+
+    foreach(QPolygonF *a , boundingBlock)
     {
-        AllLine->append(a->linelist.at(0));
-        AllLine->append(a->linelist.at(1));
-        AllLine->append(a->linelist.at(2));
-        AllLine->append(a->linelist.at(3));
-    }
-    sortLine(AllLine);
+
+        if(block->intersects(*a))
+         {
+            qDebug("helloo");
+            *block = block->united(*a);
+            boundingBlock.removeOne(a);
+         }
+   }
+
+    return block;
 }
+
+void PathPlanning::constructGraph()
+{
+    foreach (QPolygonF *a , boundingBlock)
+    {
+        foreach(QPointF p , a->toList())
+        {
+            QList<QPointF> tmp;
+            tmp.append(Myview->mapToScene(p.toPoint()));
+            graph.append(tmp);
+        }
+    }
+
+    foreach(QList<QPointF> a ,graph)
+    {
+        foreach(QList<QPointF> b ,graph)
+        {
+            if(!a.contains(b.first()))
+            {
+                 QGraphicsLineItem *line = new QGraphicsLineItem;
+                 line->setLine(a.first().rx(),a.first().ry(),b.first().rx(),b.first().ry());
+                 MyScene->addItem(line);
+                 qDebug() <<  line->collidingItems(Qt::ContainsItemShape).length();
+                 if(
+                       //not line->collidingItems().toSet().subtract(line->collidingItems(Qt::ContainsItemShape).toSet()).isEmpty()
+                        line->collidingItems(Qt::ContainsItemShape).isEmpty()
+                    )
+                 {
+                     a.append(b.first());
+                     b.append(a.first());
+                     delete line;
+                 }
+                 else
+                 {
+                     MyScene->removeItem(line);
+                     delete line;
+                 }
+            }
+        }
+    }
+
+
+}
+
+
+
 
 void PathPlanning::sortLine(QList<QGraphicsLineItem*> *setOfLine)
 {
@@ -222,8 +288,10 @@ QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF
 void PathPlanning::pathFinding()
 {
 
-    MyPath = this->findPath(this->getCenterPointOfLine(MyBlock),this->start,this->end);
+
 }
+
+
 
 QPainterPath PathPlanning::getMyPath() const
 {

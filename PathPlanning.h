@@ -3,14 +3,21 @@
 #include <QList>
 #include  <drawmap.h>
 #include <QPainterPath>
+#include <QGraphicsView>
 
 class PathPlanning:public QObject
 {
     Q_OBJECT
 public:
     PathPlanning();
-    PathPlanning(CustomScene *scene,QList<DrawBlock *> block);
+    PathPlanning(CustomScene *scene,QList<DrawBlock *> block,QGraphicsView *view);
     QList<QPointF> getCenterPointOfLine(QList<DrawBlock*> block);
+    void offsetblock(QList<DrawBlock *> block);
+    QPolygonF* mergeblock(QPolygonF *block);
+    void constructGraph();
+
+
+
     void getAllLine(QList<DrawBlock *> block);
     void sortLine(QList<QGraphicsLineItem*> *setOfLine);
     void constructGraph (QList<QPointF> getCenterPointOfLine);
@@ -31,6 +38,10 @@ private:
     CustomScene *MyScene;
     QPainterPath MyPath;
     QList<DrawBlock *> MyBlock;
+    QList<QPolygonF *> boundingBlock;
+    QList<QList<QPointF>> graph;
+    QList<QGraphicsPolygonItem *> configurationSpace ;
+    QGraphicsView *Myview;
 };
 
 
