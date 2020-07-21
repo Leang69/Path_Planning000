@@ -31,10 +31,10 @@ void PathPlanning::offsetblock(QList<DrawBlock *> block)
     foreach (DrawBlock* a , block)
     {
         QPolygonF *tmp = new QPolygonF();
-        tmp->append(QPoint(a->pos().x()-25,a->pos().y()-15));
-        tmp->append(QPoint(a->pos().x()+25+50,a->pos().y()-15));
-        tmp->append(QPoint(a->pos().x()+25+50,a->pos().y()+15+50));
-        tmp->append(QPoint(a->pos().x()-25,a->pos().y()+15+50));
+        tmp->append(QPointF(a->pos().x()-25,a->pos().y()-15));
+        tmp->append(QPointF(a->pos().x()+25+50,a->pos().y()-15));
+        tmp->append(QPointF(a->pos().x()+25+50,a->pos().y()+15+50));
+        tmp->append(QPointF(a->pos().x()-25,a->pos().y()+15+50));
         tmp = this->mergeblock(tmp);
         boundingBlock.append(tmp);
     }
@@ -43,6 +43,17 @@ void PathPlanning::offsetblock(QList<DrawBlock *> block)
 
         configurationSpace.append(new QGraphicsPolygonItem(*a));
         MyScene->addItem(configurationSpace.last());
+    }
+    boundingBlock.clear();
+    foreach (DrawBlock* a , block)
+    {
+        QPolygonF *tmp = new QPolygonF();
+        tmp->append(QPointF(a->pos().x()-27,a->pos().y()-17));
+        tmp->append(QPointF(a->pos().x()+27+50,a->pos().y()-17));
+        tmp->append(QPointF(a->pos().x()+27+50,a->pos().y()+17+50));
+        tmp->append(QPointF(a->pos().x()-27,a->pos().y()+17+50));
+        tmp = this->mergeblock(tmp);
+        boundingBlock.append(tmp);
     }
     constructGraph();
 
@@ -74,38 +85,46 @@ void PathPlanning::constructGraph()
         foreach(QPointF p , a->toList())
         {
             QList<QPointF> tmp;
-            tmp.append(Myview->mapToScene(p.toPoint()));
+            tmp.append(p);
             graph.append(tmp);
         }
     }
 
+
     foreach(QList<QPointF> a ,graph)
     {
+
         foreach(QList<QPointF> b ,graph)
         {
+
             if(!a.contains(b.first()))
             {
                  QGraphicsLineItem *line = new QGraphicsLineItem;
                  line->setLine(a.first().rx(),a.first().ry(),b.first().rx(),b.first().ry());
                  MyScene->addItem(line);
-                 qDebug() <<  line->collidingItems(Qt::ContainsItemShape).length();
-                 if(
-                       //not line->collidingItems().toSet().subtract(line->collidingItems(Qt::ContainsItemShape).toSet()).isEmpty()
-                        line->collidingItems(Qt::ContainsItemShape).isEmpty()
-                    )
+                 if(line->collidingItems().isEmpty())
                  {
+                     int indxA = graph.indexOf(a);
                      a.append(b.first());
-                     b.append(a.first());
-                     delete line;
+                     graph.replace(indxA,a);
+
                  }
-                 else
-                 {
-                     MyScene->removeItem(line);
-                     delete line;
-                 }
+                MyScene->removeItem(line);
+                delete line;
             }
+
         }
     }
+    for(int j = 0 ; j < graph.length() ; j++)
+    {
+        for(int i = 1 ; i < graph.at(j).length() ; i++)
+        {
+            QGraphicsLineItem *line = new QGraphicsLineItem;
+            line->setLine(graph.at(j).at(0).x(),graph.at(j).at(0).y(),graph.at(j).at(i).x(),graph.at(j).at(i).y());
+            MyScene->addItem(line);
+        }
+    }
+
 
 
 }
