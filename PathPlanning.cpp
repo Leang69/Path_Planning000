@@ -66,7 +66,6 @@ QPolygonF* PathPlanning::mergeblock(QPolygonF *block)
 
         if(block->intersects(*a))
          {
-            //qDebug("helloo");
             *block = block->united(*a);
             boundingBlock.removeOne(a);
          }
@@ -209,7 +208,7 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
         line.setP1(node.at(startVisibilitylist.at(i)));
         line.setP2(end);
         qreal tmp = line.length();
-        qDebug() << tmp << " + " << g << " < " << min << (tmp + g < min);
+        //qDebug() << tmp << " + " << g << " < " << min << (tmp + g < min);
         if(tmp + g < min)
         {
             nodeShortIndex = startVisibilitylist.at(i);
@@ -220,16 +219,12 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
     QLineF line ;
     line.setP1(start);
     line.setP2(node.at(nodeShortIndex));
-     qDebug() << "g" << g;
     g = g + line.length();
-     qDebug() << "g" << g;
     openset.append(nodeShortIndex);
     while (graph[openset.last()].length() > 1)
     {
-        qDebug() << "-----------------------------------";
        min = Q_INFINITY;
-       length = Q_INFINITY;
-       qDebug() << graph[openset.last()];
+       //qDebug() << graph[openset.last()];
         if(graph[openset.last()].contains(graph.last().first()))
         {
             openset.append(graph.last().first());
@@ -241,33 +236,41 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
             {
                 continue;
             }
-            QLineF line ;
-            line.setP1(node.at(graph[openset.last()].at(i)));
-            line.setP2(end);
-            qreal tmp = line.length();
-            tmp = tmp + line.length();
-            qDebug() << tmp << " + " << g << " < " << min << (tmp + g < min);
-            if(tmp + g < min)
+            QLineF lineH , lineG ;
+            lineH.setP1(node.at(graph[openset.last()].at(i)));
+            lineH.setP2(end);
+            lineG.setP2(node.at(openset.last()));
+            lineG.setP1(node.at(graph[openset.last()].at(i)));
+
+            qreal tmpg , tmph;
+            tmpg = lineG.length();
+            tmph = lineH.length();
+            //qDebug() << tmpg << " + " << g  << " + " << tmph << " = " << (tmpg + g + tmph) << " : min " << min << " " << ((tmpg + g + tmph) < min);
+            tmpg = tmpg + g;
+            qreal f;
+
+            f = tmpg + tmph;
+            //qDebug() << (f) ;
+            if(f < min)
             {
                 nodeShortIndex = graph[openset.last()].at(i);
-                min = tmp + g;
+                min = f;
             }
         }
         QLineF line ;
         line.setP1(node.at(openset.last()));
         line.setP2(node.at(nodeShortIndex));
         g = g + line.length();
-        qDebug() << "g" << g;
         openset.append(nodeShortIndex);
-        qDebug() << "-----------------------------------";
     }
     MyPath = constructPath(openset);
-
     MyScene->addPath(*MyPath);
     foreach(QGraphicsPolygonItem *a , configurationSpace)
     {
         MyScene->removeItem(a);
     }
+
+
     return *MyPath;
 }
 void PathPlanning::pathFinding()
