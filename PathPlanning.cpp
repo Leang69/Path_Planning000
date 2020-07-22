@@ -3,7 +3,7 @@
 #include <QGraphicsLineItem>
 #include <QDebug>
 #include <QThread>
-
+#include <QElapsedTimer>
 #include <customscene.h>
 PathPlanning::PathPlanning()
 {
@@ -16,8 +16,7 @@ PathPlanning::PathPlanning(CustomScene *scene,QList<DrawBlock *> block,QGraphics
    MyBlock = block;
    Myview = view;
    offsetblock(MyBlock);
-
-   connect(MyScene,&CustomScene::chagendStartPos,this,&PathPlanning::setStart);
+    connect(MyScene,&CustomScene::chagendStartPos,this,&PathPlanning::setStart);
    connect(MyScene,&CustomScene::chagendEndtPos,this,&PathPlanning::setEnd);
    scene->addItem(startNode);
    scene->addItem(EndNode);
@@ -40,7 +39,6 @@ void PathPlanning::offsetblock(QList<DrawBlock *> block)
     }
     foreach (QPolygonF *a , boundingBlock)
     {
-
         configurationSpace.append(new QGraphicsPolygonItem(*a));
         MyScene->addItem(configurationSpace.last());
     }
@@ -55,7 +53,6 @@ void PathPlanning::offsetblock(QList<DrawBlock *> block)
         tmp = this->mergeblock(tmp);
         boundingBlock.append(tmp);
     }
-    constructGraph();
 
 }
 
@@ -69,7 +66,7 @@ QPolygonF* PathPlanning::mergeblock(QPolygonF *block)
 
         if(block->intersects(*a))
          {
-            qDebug("helloo");
+            //qDebug("helloo");
             *block = block->united(*a);
             boundingBlock.removeOne(a);
          }
@@ -86,228 +83,208 @@ void PathPlanning::constructGraph()
         {
             QList<QPointF> tmp;
             tmp.append(p);
-            graph.append(tmp);
+            node.append(tmp);
+            QList<int> c;
+            graph.append(c);
+        }
+    }
+
+    for(int i = 0 ; i < node.length() ; i++)
+    {
+        graph[i].append(i);
+    }
+
+    for(int i = 0 ; i < node.length() ; i++)
+    {
+
+        for(int j = 0 ; j < node.length() ; j++)
+        {
+              if(i != j)
+              {
+                  if(!graph.at(i).contains(j))
+                  {
+
+                      QGraphicsLineItem *line = new QGraphicsLineItem;
+                      line->setLine(node.at(i).x(),node.at(i).y(),node.at(j).x(),node.at(j).y());
+                      MyScene->addItem(line);
+                      if(line->collidingItems().isEmpty())
+                      {
+                          graph[i].append(j);
+                          graph[j].append(i);
+
+                       }
+                       MyScene->removeItem(line);
+                       delete line;
+                  }
+
+              }
         }
     }
 
 
-    foreach(QList<QPointF> a ,graph)
+}
+
+void PathPlanning::startVisibility()
+{
+    for(int i = 0 ; i < graph.length() ; i++)
     {
-
-        foreach(QList<QPointF> b ,graph)
+        QGraphicsLineItem *line = new QGraphicsLineItem;
+        line->setLine(start.x(),start.y(),node.at(i).x(),node.at(i).y());
+        MyScene->addItem(line);
+        if(line->collidingItems().isEmpty())
         {
-
-            if(!a.contains(b.first()))
-            {
-                 QGraphicsLineItem *line = new QGraphicsLineItem;
-                 line->setLine(a.first().rx(),a.first().ry(),b.first().rx(),b.first().ry());
-                 MyScene->addItem(line);
-                 if(line->collidingItems().isEmpty())
-                 {
-                     int indxA = graph.indexOf(a);
-                     a.append(b.first());
-                     graph.replace(indxA,a);
-
-                 }
-                MyScene->removeItem(line);
-                delete line;
-            }
-
+            startVisibilitylist.append(i);
         }
+        MyScene->removeItem(line);
+        delete  line;
     }
-    for(int j = 0 ; j < graph.length() ; j++)
+}
+
+void PathPlanning::endVisibility()
+{
+    node.append(end);
+    QList<int> c;
+    graph.append(c);
+    graph.last().append(graph.length()-1);
+
+    for(int i = 0 ; i < graph.length() - 1 ; i++)
     {
-        for(int i = 1 ; i < graph.at(j).length() ; i++)
+        QGraphicsLineItem *line = new QGraphicsLineItem;
+        line->setLine(end.x(),end.y(),node.at(i).x(),node.at(i).y());
+        MyScene->addItem(line);
+        if(line->collidingItems().isEmpty())
         {
-            QGraphicsLineItem *line = new QGraphicsLineItem;
-            line->setLine(graph.at(j).at(0).x(),graph.at(j).at(0).y(),graph.at(j).at(i).x(),graph.at(j).at(i).y());
-            MyScene->addItem(line);
+            graph[i].append(graph.length()-1);
         }
+        MyScene->removeItem(line);
+        delete  line;
     }
-
-
-
 }
 
-
-
-
-void PathPlanning::sortLine(QList<QGraphicsLineItem*> *setOfLine)
+QPainterPath *PathPlanning::constructPath(QList<int> roadmap)
 {
-        int i, j;
-        qreal key;
-        for (i = 1; i < setOfLine->length(); i++)
-        {
-            key = setOfLine->at(i)->line().center().x() * 10000 + setOfLine->at(i)->line().center().y();
-            j = i - 1;
-            /* Move elements of arr[0..i-1], that are
-            greater than key, to one position ahead
-            of their current position */
-            while (j >= 0 && (setOfLine->at(j)->line().center().x() * 10000 + setOfLine->at(j)->line().center().y() > key))
-            {
-                j = j - 1;
-            }
-            setOfLine->move(i,j+1);
-
-        }
-}
-
-void PathPlanning::constructGraph(QList<QPointF> getCenterPointOfLine)
-{
-
-}
-
-QPainterPath PathPlanning::findPath(QList<QPointF> Allnode,QPointF start,QPointF end)
-{
-    QList<int> pointINumber;
-    int startIndex = 0;
-    int endIndex = 1;
-    foreach(QPointF a , Allnode)
+    QPainterPath *path = new QPainterPath;
+    path->moveTo(start);
+//    foreach(int a , roadmap)
+//    {
+//        path->lineTo(node.at(a));
+//    }
+    for(int a = 0 ; a < roadmap.length() ; a++)
     {
-        if(start.x()*10000+start.y() <= a.x()*10000+a.y())
-            break;
+        if(a < roadmap.length() - 1)
+        {
+        QLineF line;
+        line.setP1(path->currentPosition());
+        line.setP2(node.at(roadmap.at(a)));
+        line.setLength(line.length()-15);
+        path->lineTo(line.p2());
+        line.setP1(node.at(roadmap.at(a+1)));
+        line.setP2(node.at(roadmap.at(a)));
+        line.setLength(15);
+        path->quadTo(node.at(roadmap.at(a)),line.p2());
+        }
         else
-            startIndex++;
+        {
+            path->lineTo(node.at(roadmap.at(a)));
+        }
     }
-    foreach(QPointF a , Allnode)
-    {
-        if(end.x()*10000+end.y() <= a.x()*10000+a.y())
-            break;
-        else
-            endIndex++;
-    }
+    return path;
+}
 
-    Allnode.insert(startIndex,start); Allnode.insert(endIndex,end);
-    if(startIndex > endIndex)
-    {
-        int tmp = startIndex;
-        startIndex = endIndex;
-        endIndex = tmp;
-        Allnode.move(startIndex,startIndex-1);
-        Allnode.move(endIndex,endIndex-1);
-        startIndex--;
-        endIndex++;
-    }
-    qDebug() << Allnode;
-    qDebug() << "---------------------------------------------------";
-    qDebug() << startIndex;
-    qDebug() << endIndex;
-    qDebug() << "---------------------------------------------------";
+
+QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
+{
+
     QPainterPath *MyPath = new QPainterPath;
-    MyPath->moveTo(Allnode.at(startIndex));
-    QGraphicsLineItem *LinePath = new QGraphicsLineItem;
-    QGraphicsLineItem *LineTmp= new QGraphicsLineItem;
-    QLineF *l1 = new QLineF;
-    QLineF *l2 = new QLineF;
-    MyScene->addItem(LinePath);
-    MyScene->addItem(LineTmp);
-    LinePath->setVisible(false);
-
-    int sourceIndex = startIndex;
-    int shortLength = 10000000;
-    int shortIndex = startIndex;
-    int x = Allnode.at(sourceIndex).x();
-
-    l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-    LinePath->setLine(*l1);
-    if(LinePath->collidingItems().length() == 0)
+    this->endVisibility();
+    this->startVisibility();
+    QList<int> openset;
+    qreal length = Q_INFINITY;
+    qreal g = 0;
+    qreal min = Q_INFINITY;
+    int nodeShortIndex;
+    for(int i = 0 ; i < startVisibilitylist.length() ; i++)
     {
-        MyPath->lineTo(Allnode.at(endIndex));
-        return *MyPath;
-
-    }
-
-    for(int i = startIndex+1 ; i < endIndex ; i++)
-    {
-        /*l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-         *
-        LinePath->setLine(*l1);
-        if(LinePath->collidingItems().length() == 0)
+        QLineF line ;
+        line.setP1(node.at(startVisibilitylist.at(i)));
+        line.setP2(end);
+        qreal tmp = line.length();
+        qDebug() << tmp << " + " << g << " < " << min << (tmp + g < min);
+        if(tmp + g < min)
         {
-            MyPath->lineTo(Allnode.at(endIndex));
-            break;
-        }
-        else
-        {
-
-            if(Allnode.at(i).x() == x)
-            {
-                l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(i).x()-5,Allnode.at(i).y()-2.5);
-                l2->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-                LinePath->setLine(*l1);
-                int length = l1->length() + l2->length();
-                if(shortLength > length && LinePath->collidingItems().length() == 0)
-                {
-                    shortLength = length;
-                    shortIndex = i;
-                }
-
-            }
-            else
-            {
-                MyPath->lineTo(Allnode.at(shortIndex));
-                sourceIndex = shortIndex;
-                l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(i).x()-5,Allnode.at(i).y()-2.5);
-                l2->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-                LinePath->setLine(*l1);
-                int length = l1->length() + l2->length();
-                if(shortLength > length && LinePath->collidingItems().length() == 0)
-                {
-                    shortLength = length;
-                    shortIndex = i;
-                }
-            }
-
-        }*/
-
-        l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-        LinePath->setLine(*l1);
-        if(LinePath->collidingItems().length() == 0 && Allnode.length() > 8)
-        {
-            MyPath->lineTo(Allnode.at(endIndex));
-            break;
-        }
-        else
-        {
-            l1->setLine(Allnode.at(sourceIndex).x()+5,Allnode.at(sourceIndex).y()+2.5,Allnode.at(endIndex).x()-5,Allnode.at(endIndex).y()-2.5);
-            if(Allnode.at(i).x() == x)
-            {
-
-                    l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
-                    l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
-                    LinePath->setLine(*l1);
-                    int length = l2->length();
-                    if(shortLength > length && LinePath->collidingItems().length() == 0)
-                    {
-                        shortLength = length;
-                        shortIndex = i;
-                    }
-            }
-            else
-            {
-                    MyPath->lineTo(Allnode.at(shortIndex));
-                    sourceIndex = shortIndex;
-                    shortLength = 10000000;
-                    l1->setLine(Allnode.at(sourceIndex).x(),Allnode.at(sourceIndex).y(),Allnode.at(i).x(),Allnode.at(i).y());
-                    l2->setLine(Allnode.at(i).x(),Allnode.at(i).y(),Allnode.at(endIndex).x(),Allnode.at(endIndex).y());
-                    LinePath->setLine(*l1);
-                    int length = l2->length();
-                    if(shortLength > length && LinePath->collidingItems().length() == 0)
-                    {
-                        shortLength = length;
-                        shortIndex = i;
-                    }
-            }
+            nodeShortIndex = startVisibilitylist.at(i);
+            min = tmp + g;
         }
 
     }
-    MyPath->lineTo(Allnode.at(endIndex));
+    QLineF line ;
+    line.setP1(start);
+    line.setP2(node.at(nodeShortIndex));
+     qDebug() << "g" << g;
+    g = g + line.length();
+     qDebug() << "g" << g;
+    openset.append(nodeShortIndex);
+    while (graph[openset.last()].length() > 1)
+    {
+        qDebug() << "-----------------------------------";
+       min = Q_INFINITY;
+       length = Q_INFINITY;
+       qDebug() << graph[openset.last()];
+        if(graph[openset.last()].contains(graph.last().first()))
+        {
+            openset.append(graph.last().first());
+            break;
+        }
+        for(int i = 1 ; i < graph[openset.last()].length() ; i++)
+        {
+            if(openset.count(graph[openset.last()].at(i)))
+            {
+                continue;
+            }
+            QLineF line ;
+            line.setP1(node.at(graph[openset.last()].at(i)));
+            line.setP2(end);
+            qreal tmp = line.length();
+            tmp = tmp + line.length();
+            qDebug() << tmp << " + " << g << " < " << min << (tmp + g < min);
+            if(tmp + g < min)
+            {
+                nodeShortIndex = graph[openset.last()].at(i);
+                min = tmp + g;
+            }
+        }
+        QLineF line ;
+        line.setP1(node.at(openset.last()));
+        line.setP2(node.at(nodeShortIndex));
+        g = g + line.length();
+        qDebug() << "g" << g;
+        openset.append(nodeShortIndex);
+        qDebug() << "-----------------------------------";
+    }
+    MyPath = constructPath(openset);
+
+    MyScene->addPath(*MyPath);
+    foreach(QGraphicsPolygonItem *a , configurationSpace)
+    {
+        MyScene->removeItem(a);
+    }
     return *MyPath;
 }
 void PathPlanning::pathFinding()
 {
-
-
+    constructGraph();
+    findPath(this->start,this->end);
+//    int i = graph.last().first();
+//        for(int j = 1 ; j < graph.at(i).length() ; j++)
+//        {
+//            QGraphicsLineItem *line = new QGraphicsLineItem;
+//            line->setLine(node.at(graph[i].at(0)).x(),node.at(graph[i].at(0)).y(),node.at(graph[i].at(j)).x(),node.at(graph[i].at(j)).y());
+//            MyScene->addItem(line);
+//        }
+//    foreach (QGraphicsPolygonItem *a , configurationSpace)
+//    {
+//        MyScene->removeItem(a);
+//    }
 }
 
 

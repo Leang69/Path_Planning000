@@ -15,13 +15,14 @@ public:
     void offsetblock(QList<DrawBlock *> block);
     QPolygonF* mergeblock(QPolygonF *block);
     void constructGraph();
+    void startVisibility();
+    void endVisibility();
 
 
-
+    QPainterPath *constructPath(QList<int> roadmap);
     void getAllLine(QList<DrawBlock *> block);
     void sortLine(QList<QGraphicsLineItem*> *setOfLine);
-    void constructGraph (QList<QPointF> getCenterPointOfLine);
-    QPainterPath findPath(QList<QPointF> Allnode,QPointF start,QPointF end);
+    QPainterPath findPath(QPointF start,QPointF end);
     QList<QGraphicsLineItem*> *AllLine = new QList<QGraphicsLineItem*>;
     QPointF getStart() const;
     QPointF getEnd() const;
@@ -39,7 +40,9 @@ private:
     QPainterPath MyPath;
     QList<DrawBlock *> MyBlock;
     QList<QPolygonF *> boundingBlock;
-    QList<QList<QPointF>> graph;
+    QList<QPointF> node;
+    QList<QList<int>> graph;
+    QList<int> startVisibilitylist;
     QList<QGraphicsPolygonItem *> configurationSpace ;
     QGraphicsView *Myview;
 };
