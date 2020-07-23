@@ -43,7 +43,7 @@ private:
     QList<QPointF> node;
     QList<QList<int>> graph;
     QList<int> startVisibilitylist;
-    QList<QGraphicsPolygonItem *> configurationSpace ;
+    QList<QGraphicsPolygonItem *> configurationObstacle ;
     QGraphicsView *Myview;
 };
 

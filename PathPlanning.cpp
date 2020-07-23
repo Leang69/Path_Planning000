@@ -37,10 +37,13 @@ void PathPlanning::offsetblock(QList<DrawBlock *> block)
         tmp = this->mergeblock(tmp);
         boundingBlock.append(tmp);
     }
+    QColor *c = new QColor;
     foreach (QPolygonF *a , boundingBlock)
     {
-        configurationSpace.append(new QGraphicsPolygonItem(*a));
-        MyScene->addItem(configurationSpace.last());
+        configurationObstacle.append(new QGraphicsPolygonItem(*a));
+        c->setRgb(255,0,0,180);
+        configurationObstacle.last()->setBrush(*c);
+        MyScene->addItem(configurationObstacle.last());
     }
     boundingBlock.clear();
     foreach (DrawBlock* a , block)
@@ -197,7 +200,7 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
     QPainterPath *MyPath = new QPainterPath;
     this->endVisibility();
     this->startVisibility();
-    QList<int> openset;
+    QList<int> roadmap;
     qreal length = Q_INFINITY;
     qreal g = 0;
     qreal min = Q_INFINITY;
@@ -220,27 +223,27 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
     line.setP1(start);
     line.setP2(node.at(nodeShortIndex));
     g = g + line.length();
-    openset.append(nodeShortIndex);
-    while (graph[openset.last()].length() > 1)
+    roadmap.append(nodeShortIndex);
+    while (graph[roadmap.last()].length() > 1)
     {
        min = Q_INFINITY;
        //qDebug() << graph[openset.last()];
-        if(graph[openset.last()].contains(graph.last().first()))
+        if(graph[roadmap.last()].contains(graph.last().first()))
         {
-            openset.append(graph.last().first());
+            roadmap.append(graph.last().first());
             break;
         }
-        for(int i = 1 ; i < graph[openset.last()].length() ; i++)
+        for(int i = 1 ; i < graph[roadmap.last()].length() ; i++)
         {
-            if(openset.count(graph[openset.last()].at(i)))
+            if(roadmap.count(graph[roadmap.last()].at(i)))
             {
                 continue;
             }
             QLineF lineH , lineG ;
-            lineH.setP1(node.at(graph[openset.last()].at(i)));
+            lineH.setP1(node.at(graph[roadmap.last()].at(i)));
             lineH.setP2(end);
-            lineG.setP2(node.at(openset.last()));
-            lineG.setP1(node.at(graph[openset.last()].at(i)));
+            lineG.setP2(node.at(roadmap.last()));
+            lineG.setP1(node.at(graph[roadmap.last()].at(i)));
 
             qreal tmpg , tmph;
             tmpg = lineG.length();
@@ -253,19 +256,19 @@ QPainterPath PathPlanning::findPath(QPointF startp,QPointF endp)
             //qDebug() << (f) ;
             if(f < min)
             {
-                nodeShortIndex = graph[openset.last()].at(i);
+                nodeShortIndex = graph[roadmap.last()].at(i);
                 min = f;
             }
         }
         QLineF line ;
-        line.setP1(node.at(openset.last()));
+        line.setP1(node.at(roadmap.last()));
         line.setP2(node.at(nodeShortIndex));
         g = g + line.length();
-        openset.append(nodeShortIndex);
+        roadmap.append(nodeShortIndex);
     }
-    MyPath = constructPath(openset);
+    MyPath = constructPath(roadmap);
     MyScene->addPath(*MyPath);
-    foreach(QGraphicsPolygonItem *a , configurationSpace)
+    foreach(QGraphicsPolygonItem *a , configurationObstacle)
     {
         MyScene->removeItem(a);
     }
@@ -299,7 +302,7 @@ QPainterPath PathPlanning::getMyPath() const
 void PathPlanning::setStart()
 {
     start = MyScene->getcursorPos();
-    qDebug() << "Start";
+    //qDebug() << "Start";
     startNode->setRect(start.x()-7,start.y()+2.5,5,5);
     startNode->setBrush(Qt::yellow);
 }
@@ -307,7 +310,7 @@ void PathPlanning::setStart()
 void PathPlanning::setEnd()
 {
     end = MyScene->getcursorPos();
-    qDebug() << "End";
+    //qDebug() << "End";
     EndNode->setRect(end.x()+1,end.y()+2.5,5,5);
     EndNode->setBrush(Qt::gray);
 }
